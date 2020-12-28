@@ -33,9 +33,13 @@ services:
       GROUP_ID: ${GID}
       EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
     ports:
-      - "8080:8080"
-      - "8443:8443"
-      - "5007:5007"
+      - "8080:8080"			            # HTTP port of the web interface
+      - "8443:8443"		            	# HTTPS port of the web interface
+      - "5007:5007"			            # LSP port for validating rules
+      - "1900-1901:1900-1901/udp"	  # UPNP Discovery
+      - "6969:6969/udp"			        # Sonos
+      - "8008-8009:8008-8009/udp" 	# Chromecast
+      - "5353:5353/udp"             # Multicast DNS (mDNS)
   frontail:
     image: welteki/frontail-openhab:latest
     container_name: frontail
