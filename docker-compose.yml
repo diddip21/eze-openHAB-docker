@@ -33,9 +33,23 @@ services:
       GROUP_ID: ${GID}
       EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
     ports:
-      - "8080:8080"
-      - "8443:8443"
-      - "5007:5007"
+      - "8080:8080" # HTTP port of the web interface
+      - "8443:8443" # HTTPS port of the web interface
+      - "5007:5007" # LSP port for validating rules
+      - "1900:1900" # UPNP Discovery
+      - "1901:1901" # UPNP Discovery
+      - "1900:1900/udp" # UPNP Discovery
+      - "1901:1901/udp" # UPNP Discovery
+      - "6969:6969/udp" # Sonos
+      - "8008:8008" # Chromecast
+      - "8009:8009" # Chromecast
+      - "8008:8008/udp" # Chromecast
+      - "8009:8009/udp" # Chromecast
+      - "3689:3689" # Digital Audio Access Protocol (DAAP)
+      - "3689:3689/udp" # Digital Audio Access Protocol (DAAP)
+      - "5297:5297" # Bonjour
+      - "5297:5297/udp" # Bonjour
+      - "5353:5353/udp" # Multicast DNS (mDNS)
   frontail:
     image: welteki/frontail-openhab:latest
     container_name: frontail
@@ -75,21 +89,24 @@ services:
       - "3000:3000"
     env_file:
       - "${PWD}/env.grafana"
+    links:
+      - influxdb
     volumes:
       - "${PWD}/grafana/data:/var/lib/grafana/"
-  nodered:
+      - "${PWD}/grafana/grafana-provisioning/:/etc/grafana/provisioning"
+  #nodered:
     # If you are running on RaspBerryPi change the image to
     # nodered/node-red-docker:rpi
-    image: nodered/node-red-docker:rpi
-    container_name: nodered
-    restart: always
-    networks:
-      - backbone
-    user: root
-    ports:
-      - "1880:1880"
-    volumes:
-      - ./nodered:/data
+    #image: nodered/node-red-docker:rpi
+    #container_name: nodered
+    #restart: always
+    #networks:
+    #  - backbone
+    #user: root
+    #ports:
+    #  - "1880:1880"
+    #volumes:
+    #  - ./nodered:/data
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
@@ -102,6 +119,12 @@ services:
     volumes:
       - "${PWD}/mosquitto/conf:/mosquitto/config/"
       - "${PWD}/mosquitto/data/:/mosquitto/data/"
+  #renim:
+    #build: ./renim
+    #container_name: renim
+    #restart: unless-stopped
+    #env_file:
+    #  - "${PWD}/env.renim"
 networks:
   backbone:
     driver: bridge
