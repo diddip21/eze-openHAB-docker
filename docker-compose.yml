@@ -1,4 +1,4 @@
-version: "2.2"
+version: "3.5"
 
 services:
   nginx: 
@@ -23,9 +23,9 @@ services:
       # If you are on Windows delete the /etc/localtime and /etc/timezone lines
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
-      - "${PWD}/openhab_addons:/openhab/addons"
-      - "${PWD}/openhab_conf:/openhab/conf"
-      - "${PWD}/openhab_userdata:/openhab/userdata"
+      - "${PWD}/openhab/addons:/openhab/addons"
+      - "${PWD}/openhab/conf:/openhab/conf"
+      - "${PWD}/openhab/userdata:/openhab/userdata"
     environment:
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
@@ -49,7 +49,7 @@ services:
       - "3689:3689/udp" # Digital Audio Access Protocol (DAAP)
       - "5297:5297" # Bonjour
       - "5297:5297/udp" # Bonjour
-      - "5353:5353/udp" # Multicast DNS (mDNS)
+      #- "5353:5353/udp" # Multicast DNS (mDNS)
   frontail:
     image: welteki/frontail-openhab:latest
     container_name: frontail
@@ -59,7 +59,7 @@ services:
     ports:
       - "8081:9001"
     volumes:
-      - "${PWD}/openhab_userdata/logs:/var/log/openhab2:ro"
+      - "${PWD}/openhab/userdata/logs:/var/log/openhab2:ro"
     #command: "-p 8001 --ui-highlight --ui-highlight-preset /preset/openhab.json -t openhab /log/openhab.log /log/events.log"
   influxdb:
     image: influxdb:latest
@@ -67,6 +67,7 @@ services:
     restart: always
     networks:
       - backbone
+    user: "${UID}:${GID}"
     ports:
       - "8083:8083"
       - "8086:8086"
@@ -77,7 +78,7 @@ services:
       # Check the file to set default password!
       - "${PWD}/env.influxdb"
     volumes:
-      - "${PWD}/influxdb/data:/var/lib/influxdb/"
+      - "${PWD}/influxdb/data:/var/lib/influxdb"
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -92,8 +93,8 @@ services:
     links:
       - influxdb
     volumes:
-      - "${PWD}/grafana/data:/var/lib/grafana/"
-      - "${PWD}/grafana/grafana-provisioning/:/etc/grafana/provisioning"
+      - "${PWD}/grafana/data:/var/lib/grafana"
+      - "${PWD}/grafana/grafana-provisioning:/etc/grafana/provisioning"
   #nodered:
     # If you are running on RaspBerryPi change the image to
     # nodered/node-red-docker:rpi
@@ -117,8 +118,8 @@ services:
       - "1883:1883"
       - "1884:1884"
     volumes:
-      - "${PWD}/mosquitto/conf:/mosquitto/config/"
-      - "${PWD}/mosquitto/data/:/mosquitto/data/"
+      - "${PWD}/mosquitto/conf:/mosquitto/config"
+      - "${PWD}/mosquitto/data:/mosquitto/data"
   #renim:
     #build: ./renim
     #container_name: renim

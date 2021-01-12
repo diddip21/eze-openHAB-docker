@@ -1,7 +1,2 @@
-grafana/
-influxdb/
-openhab_conf/
-openhab_userdata/
 nodered/
 *.*\~
-mosquitto/
